@@ -1,9 +1,19 @@
 import React from "react";
 import { useFormik } from "formik";
+import validationSchema from "./validations";
+import "./styles.css";
 
 //useFormik kullanarak
 function Contact() {
-  const { handleSubmit, handleChange, isSubmitting } = useFormik({
+  const {
+    handleSubmit,
+    handleChange,
+    isSubmitting,
+    errors,
+    values,
+    touched,
+    handleBlur,
+  } = useFormik({
     initialValues: {
       firstName: "",
       lastName: "",
@@ -11,10 +21,19 @@ function Contact() {
     },
     onSubmit: async (values, bag) => {
       await new Promise((r) => setTimeout(r, 1000)); //submit edince butonu 1 sn inaktif yapar, o sırada veri girişini engeller
-      console.log(values);
+
+      if (values.email === "test@test.com") {
+        return bag.setErrors({
+          email: "Bu mail adresi zaten kullanılıyor.",
+        });
+      }
+
       bag.resetForm(); //formu submit ettikten sonra inputları temizler, formu resetler
     },
+    validationSchema,
   });
+
+  console.log(touched);
 
   return (
     <div>
@@ -27,9 +46,15 @@ function Contact() {
             id="firstName"
             name="firstName"
             placeholder="İpek"
+            value={values.firstName}
             disabled={isSubmitting}
             onChange={handleChange("firstName")}
+            onBlur={handleBlur("firstName")}
           />
+
+          {errors.firstName && touched.firstName && (
+            <div className="error">{errors.firstName}</div>
+          )}
         </div>
 
         <div>
@@ -38,9 +63,15 @@ function Contact() {
             id="lastName"
             name="lastName"
             placeholder="Çıdık"
+            value={values.lastName}
             disabled={isSubmitting}
             onChange={handleChange("lastName")}
+            onBlur={handleBlur("latName")}
           />
+
+          {errors.lastName && touched.lastName && (
+            <div className="error"> {errors.lastName} </div>
+          )}
         </div>
 
         <div>
@@ -50,9 +81,15 @@ function Contact() {
             name="email"
             placeholder="ipek@gmail.com"
             type="email"
+            value={values.email}
             disabled={isSubmitting}
             onChange={handleChange("email")}
+            onBlur={handleBlur("email")}
           />
+
+          {errors.email && touched.email && (
+            <div className="error"> {errors.email} </div>
+          )}
         </div>
 
         <div>
@@ -61,9 +98,15 @@ function Contact() {
             id="message"
             name="message"
             placeholder="Your message..."
+            value={values.message}
             disabled={isSubmitting}
             onChange={handleChange("message")}
+            onBlur={handleBlur("message")}
           />
+
+          {errors.message && touched.message && (
+            <div className="error"> {errors.message} </div>
+          )}
         </div>
 
         {/* isSubmitting ile buton await süresince tıklanamaz ve o sırada veri girişi de yapılamaz  */}
